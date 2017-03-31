@@ -1,54 +1,47 @@
 'use strict';
 
 module.exports.incoming = (event, context, callback) => {
-  const stage = event && event.requestContext ? event.requestContext.stage : 'development';
+  const stage =
+    event.requestContext
+    ? event.requestContext.stage
+    : 'test';
+
   let ConfigFile = require('config');
+	let async = require('async');
+
   let stripe_api_key    =
     stage == 'test'
     ? ConfigFile.stripe.test_sk
     : ConfigFile.stripe.live_sk;
-	var aws = require('aws-sdk'),
-		  async = require('async');
-  var stripe = require('stripe')(stripe_api_key);
-  var incoming = {};
+  let stripe = require('stripe')(stripe_api_key);
 
   console.log('Event: %j', event);
   async.waterfall([
   function(nextProcess) {
-    let event;  // https://stripe.com/docs/api#event_object
+    let stripe_event;
     try {
-      event = JSON.parse(event.body);
-      console.log('Incoming: %j', event);
-      nextProcess(null, event);
+      stripe_event = JSON.parse(event.body); // https://stripe.com/docs/api#event_object
+      console.log('Incoming Data: %j', stripe_event);
+      nextProcess(null, stripe_event);
     } catch(err){
       nextProcess(err);
     }
   },
-  function(event, nextProcess) {
+  function(stripe_event, nextProcess) {
     // Verify the event by fetching it from Stripe
-    stripe.events.retrieve(event.id, nextProcess);
+    stripe.events.retrieve(stripe_event.id, nextProcess);
   },
-  function(event, nextProcess) {
-    // retrieve stripe customer data
-    incoming = event;
-    if (incoming.data && incoming.data.object && incoming.data.object.customer) {
-      stripe.customers.retrieve(incoming.data.object.customer, nextProcess);
-    } else {
-      nextProcess(null, incoming);
-    }
-  },
-  function(customer, nextProcess) {
+  function(stripe_event, nextProcess) {
     // Branch by the event type
-    let event_type = incoming.type ? incoming.type : '';
+    let event_type = stripe_event.type ? stripe_event.type : '';
     console.log('Event: ' + event_type);
-    console.log('Customer: %j', customer);
 
     switch(event_type) {
       case 'invoice.created':
-        nextProcess(null, incoming);
+        nextProcess(null, stripe_event);
         break;
       default:
-        nextProcess(null, incoming);
+        nextProcess(null, stripe_event);
         break;
     }
   }],
@@ -57,7 +50,6 @@ module.exports.incoming = (event, context, callback) => {
       statusCode: 200,
       body: JSON.stringify({
         message: 'Stripe webhook incoming!',
-        input: incoming,
         stage: stage
       }),
     };

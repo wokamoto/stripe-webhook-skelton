@@ -5,5 +5,5 @@ jspm_packages
 # Serverless directories
 .serverless
 
-# Config yaml (production)
-config/production.yaml
+# Config yaml (local.yaml)
+config/local.yaml

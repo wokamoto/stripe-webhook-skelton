@@ -12,7 +12,7 @@ $ npm install
 
 4. **Edit config overrides for production deployment**
 ```bash
-$ vi config/production.yaml
+$ vi config/local.yaml
 ```
 
 ```yaml
