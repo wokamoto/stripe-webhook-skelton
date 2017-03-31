@@ -1,0 +1,21 @@
+{
+  "name": "stripe-webhook",
+  "version": "1.0.0",
+  "description": "1. **Install serverless framework via npm:** ```bash npm install -g serverless ```",
+  "main": "handler.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokamoto/stripe-webhook-skelton.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wokamoto/stripe-webhook-skelton/issues"
+  },
+  "homepage": "https://github.com/wokamoto/stripe-webhook-skelton#readme"
+}
